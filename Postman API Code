@@ -1,0 +1,38 @@
+    func callLoginAPI() {
+        
+
+        var semaphore = DispatchSemaphore (value: 0)
+
+        let parameters = "{\"DeviceId\":\"CJ6HNfTFujU8IW+Xj02iOyK63tkPUIldVkzUKtFqdc6qiPe8h29I1ueY3cEXfv45\",\"OrganizationCode\":\"h001\",\"Password\":\"sTfZhMldAV9sIUY4PqhjKw==\",\"UserName\":\"iosuser\",\"UserType\":\"ANG\"}"
+        let postData = parameters.data(using: .utf8)
+
+        var request = URLRequest(url: URL(string: "http://uat.care4u.online/cura_test/mobile/ResidentService.svc/LoginMobileUserRecord")!,timeoutInterval: Double.infinity)
+        request.addValue("text/plain", forHTTPHeaderField: "Content-Type")
+        request.addValue("ASP.NET_SessionId=ebed031xtup1yierpsouooms", forHTTPHeaderField: "Cookie")
+
+        request.httpMethod = "POST"
+        request.httpBody = postData
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+          guard let data = data else {
+            print(String(describing: error))
+            semaphore.signal()
+            return
+          }
+          print(String(data: data, encoding: .utf8)!)
+            
+            let objDataRes = String(data: data, encoding: .utf8)!
+            let jsonData = objDataRes.data(using: .utf8)!
+            let dictionary = try? JSONSerialization.jsonObject(with: jsonData, options: .mutableLeaves)
+            
+            if let personsDictionary = dictionary as? [String: Any] {
+                print(personsDictionary)
+            }
+            
+            
+          semaphore.signal()
+        }
+
+        task.resume()
+        semaphore.wait()
+}
