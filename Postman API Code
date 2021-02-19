@@ -1,4 +1,6 @@
-    func callLoginAPI() {
+  import Foundation
+  
+  func callLoginAPI() {
         
 
         var semaphore = DispatchSemaphore (value: 0)
